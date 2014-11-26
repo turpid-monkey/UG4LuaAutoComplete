@@ -1,5 +1,7 @@
 apply plugin: 'java'
-apply plugin: 'eclipse'
+apply plugin:'application'
+
+mainClassName = 'edu.gcsc.vrl.lua.autocompletion.UG4LuaEditor'
 
 sourceCompatibility = 1.8
 version = '0.1'
@@ -11,7 +13,17 @@ jar {
 
 repositories {
     mavenCentral()
+    maven {
+        name 'JFrog OSS snapshot repo'
+        url  'https://oss.jfrog.org/oss-snapshot-local/'
+    }
+        
+    maven {
+        name 'jcenter'
+        url  'http://jcenter.bintray.com'
+    }
 }
+        
 
 dependencies {
     compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
