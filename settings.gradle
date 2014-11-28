@@ -1,6 +1,1 @@
 rootProject.name = 'UG4LuaAutoComplete'
-
-include 'LuaAutoComplete', 'AutoComplete', 'RSyntaxTextArea'
-project(':LuaAutoComplete').projectDir = new File(settingsDir, '../LuaAutoComplete')
-project(':AutoComplete').projectDir = new File(settingsDir, '../AutoComplete')
-project(':RSyntaxTextArea').projectDir = new File(settingsDir, '../RSyntaxTextArea')
