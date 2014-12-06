@@ -26,10 +26,12 @@
 package edu.gcsc.vrl.lua.autocompletion;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
@@ -43,8 +45,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import org.fife.ui.autocomplete.AutoCompletion;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
@@ -53,119 +58,151 @@ import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.mism.forfife.LuaFoldParser;
 
+import edu.gcsc.vrl.StateFile;
+
 /**
  *
  * @author tr1nergy
  */
 public class UG4LuaEditor implements ActionListener {
-	
+
 	JMenuItem open, save;
 	JFrame frame;
 	JFileChooser fileChooser;
 	RSyntaxTextArea textArea;
+	RTextScrollPane pane;
+	StateFile<UG4EditorProfile> profile = new StateFile<UG4EditorProfile>(UG4EditorProfile.class);
 
-    private void createSwingContent() {
-    	fileChooser = new JFileChooser();
-	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
-	        "LUA Source files", "lua");
-	    fileChooser.setFileFilter(filter);
-    	
-        frame = new JFrame("UG 4 LUA Editor V0.1a");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	private void createSwingContent() {
+		fileChooser = new JFileChooser();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter(
+				"LUA Source files", "lua");
+		fileChooser.setFileFilter(filter);
 
-        //Display the window.
-        JPanel cp = new JPanel(new BorderLayout());
+		frame = new JFrame("UG 4 LUA Editor V0.1a");
+		frame.addWindowListener(new WindowAdapter(){
 
-        FoldParserManager.get().addFoldParserMapping(SyntaxConstants.SYNTAX_STYLE_LUA, new LuaFoldParser());
-        textArea = new RSyntaxTextArea();
-        textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_LUA);
-        textArea.setCodeFoldingEnabled(true);
-        textArea.setAntiAliasingEnabled(true);
-        textArea.setPreferredSize(new Dimension(400,200));
-        
-        UG4LuaAutoCompletionProvider prov = new UG4LuaAutoCompletionProvider();
-        AutoCompletion ac = new AutoCompletion(prov);
-        ac.setShowDescWindow(true);
-        ac.install(textArea);
+			@Override
+			public void windowClosing(WindowEvent paramWindowEvent) {
+				profile.save();
+			}
+			
+		});
+		
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        RTextScrollPane sp = new RTextScrollPane(textArea);
-        sp.setFoldIndicatorEnabled(true);
-        cp.add(sp);
-        
-        JMenuBar menuBar = new JMenuBar();
-        JMenu menu = new JMenu("File");
-        menuBar.add(menu);
-        open = new JMenuItem("Open...");
-        save = new JMenuItem("Save");
-        menu.add(open);
-        menu.add(save);
-        open.addActionListener(this);
-        save.addActionListener(this);
-        frame.add(menuBar, BorderLayout.NORTH);
+		// Display the window.
 
-        frame.add(cp);
-        frame.pack();
-        frame.setVisible(true);
-    }
+		FoldParserManager.get().addFoldParserMapping(
+				SyntaxConstants.SYNTAX_STYLE_LUA, new LuaFoldParser());
+		textArea = new RSyntaxTextArea(40, 80);
+		textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_LUA);
+		textArea.setCodeFoldingEnabled(true);
+		textArea.setAntiAliasingEnabled(true);
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                new UG4LuaEditor().createSwingContent();
-            }
-        });
-    }
+		UG4LuaAutoCompletionProvider prov = new UG4LuaAutoCompletionProvider();
+		AutoCompletion ac = new AutoCompletion(prov);
+		ac.setShowDescWindow(true);
+		ac.install(textArea);
+
+		pane = new RTextScrollPane(textArea);
+		pane.setFoldIndicatorEnabled(true);
+
+		JMenuBar menuBar = new JMenuBar();
+		JMenu menu = new JMenu("File");
+		menuBar.add(menu);
+		open = new JMenuItem("Open...");
+		save = new JMenuItem("Save");
+		menu.add(open);
+		menu.add(save);
+		open.addActionListener(this);
+		save.addActionListener(this);
+		frame.add(menuBar, BorderLayout.NORTH);
+
+		frame.add(pane, BorderLayout.CENTER);
+		frame.pack();
+		frame.setVisible(true);
+
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				postInit();
+			}
+		});
+	}
+
+	private void postInit() {
+		if (profile.getState().getLastFile() != null) {
+			File file = new File(profile.getState().getLastFile());
+			load(file);
+			fileChooser.setSelectedFile(file);
+		}
+	}
+
+	/**
+	 * @param args
+	 *            the command line arguments
+	 */
+	public static void main(String[] args) {
+
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				new UG4LuaEditor().createSwingContent();
+			}
+		});
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 		Object src = evt.getSource();
-		if (src==open)
-		{
-			
-		    int returnVal = fileChooser.showOpenDialog(frame);
-		    if(returnVal == JFileChooser.APPROVE_OPTION) {
-		    	try {
-		    		BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(fileChooser.getSelectedFile())));
-				    StringWriter str = new StringWriter();
-				    PrintWriter out = new PrintWriter(str);
-				    String line;
-		    		while ((line = in.readLine())!=null)
-		    		{
-		    			out.println(line);
-		    		}
-		    		in.close();
-		    		textArea.setText(str.toString());
-		    		str.close();
-		    		frame.setTitle(fileChooser.getSelectedFile().getName());
-		    	}
-		    	catch (Exception e)
-		    	{
-		    		JOptionPane.showMessageDialog(frame,
-			   			    "Could not load file.\n" + e.getMessage());
-			    	   e.printStackTrace();
-		    	}
-		       }
+		if (src == open) {
+
+			int returnVal = fileChooser.showOpenDialog(frame);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				load(fileChooser.getSelectedFile());
+			}
 		}
-		if (src==save)
-		{
+		if (src == save) {
 			int returnVal = fileChooser.showSaveDialog(frame);
-		    if(returnVal == JFileChooser.APPROVE_OPTION) {
-		       try {
-		    	   PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(fileChooser.getSelectedFile())));
-		           out.print(textArea.getText());
-		           out.close();
-		           frame.setTitle(fileChooser.getSelectedFile().getName());
-		       } catch (Exception e)
-		       {
-		    	   JOptionPane.showMessageDialog(frame,
-		   			    "Could not save file.\n" + e.getMessage());
-		    	   e.printStackTrace();
-		       }
-		    }
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				save(fileChooser.getSelectedFile());
+			}
+		}
+	}
+
+	void load(File file) {
+		try {
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					new FileInputStream(file)));
+			StringWriter str = new StringWriter();
+			PrintWriter out = new PrintWriter(str);
+			String line;
+			while ((line = in.readLine()) != null) {
+				out.println(line);
+			}
+			in.close();
+			textArea.setText(str.toString());
+			str.close();
+			frame.setTitle(file.getName());
+			profile.getState().setLastFile(file.getAbsolutePath());
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(frame,
+					"Could not load file.\n" + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	void save(File file) {
+		try {
+			PrintWriter out = new PrintWriter(new OutputStreamWriter(
+					new FileOutputStream(file)));
+			out.print(textArea.getText());
+			out.close();
+			frame.setTitle(file.getName());
+			profile.getState().setLastFile(file.getAbsolutePath());
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(frame,
+					"Could not save file.\n" + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 }
-

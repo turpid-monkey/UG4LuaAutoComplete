@@ -1,7 +1,5 @@
 package edu.gcsc.vrl.lua.autocompletion;
 
-import static org.junit.Assert.*;
-
 import java.util.List;
 
 import org.fife.ui.autocomplete.Completion;
