@@ -6,12 +6,9 @@ The project source is available under the BSD 2-clause license printed below.
 This project is part of an IDE for the UG4 shell created by the Goethe Center of Scientific Computing in Frankfurt.
 The UG4 shell is a powerful tool for solving partial differential equations in two and three space dimensions.
 
-This project contains rather specific code for creatin auto-completion suggestions for the function available in the
-UG4 shell. It depends on closed source and won't work stand-alone.
+This project contains rather specific code for creating auto-completion suggestions for the functions and classes available within the UG4 LUA shell. It depends on closed source and won't work stand-alone.
 
-In order to build this project, you need the projects RSyntaxTextArea and AutoComplete in the same directory as this project.
--> https://github.com/bobbylight/AutoComplete
--> https://github.com/bobbylight/RSyntaxTextArea
+In order to build this project, you need the following project in your (..)
 -> https://github.com/turpid-monkey/LuaAutoComplete
 
 ----------------------
