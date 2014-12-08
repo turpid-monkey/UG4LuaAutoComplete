@@ -66,29 +66,31 @@ import edu.gcsc.vrl.StateFile;
  */
 public class UG4LuaEditor implements ActionListener {
 
-	JMenuItem open, save;
+	JMenuItem open, save, ug4CompletionTxt;
 	JFrame frame;
 	JFileChooser fileChooser;
 	RSyntaxTextArea textArea;
 	RTextScrollPane pane;
-	StateFile<UG4EditorProfile> profile = new StateFile<UG4EditorProfile>(UG4EditorProfile.class);
+	StateFile<UG4EditorProfile> profile = new StateFile<UG4EditorProfile>(
+			UG4EditorProfile.class);
+	FileNameExtensionFilter luaFilefilter = new FileNameExtensionFilter(
+			"LUA Source files", "lua");
 
 	private void createSwingContent() {
 		fileChooser = new JFileChooser();
-		FileNameExtensionFilter filter = new FileNameExtensionFilter(
-				"LUA Source files", "lua");
-		fileChooser.setFileFilter(filter);
+		
+		fileChooser.setFileFilter(luaFilefilter);
 
 		frame = new JFrame("UG 4 LUA Editor V0.1a");
-		frame.addWindowListener(new WindowAdapter(){
+		frame.addWindowListener(new WindowAdapter() {
 
 			@Override
 			public void windowClosing(WindowEvent paramWindowEvent) {
 				profile.save();
 			}
-			
+
 		});
-		
+
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Display the window.
@@ -101,6 +103,7 @@ public class UG4LuaEditor implements ActionListener {
 		textArea.setAntiAliasingEnabled(true);
 
 		UG4LuaAutoCompletionProvider prov = new UG4LuaAutoCompletionProvider();
+		prov.loadUg4CompletionsTxt(profile.getState().getUg4CompletionTxt());
 		AutoCompletion ac = new AutoCompletion(prov);
 		ac.setShowDescWindow(true);
 		ac.install(textArea);
@@ -113,10 +116,14 @@ public class UG4LuaEditor implements ActionListener {
 		menuBar.add(menu);
 		open = new JMenuItem("Open...");
 		save = new JMenuItem("Save");
+		ug4CompletionTxt = new JMenuItem("Set ugCompletion.txt");
 		menu.add(open);
 		menu.add(save);
+		menu.addSeparator();
+		menu.add(ug4CompletionTxt);
 		open.addActionListener(this);
 		save.addActionListener(this);
+		ug4CompletionTxt.addActionListener(this);
 		frame.add(menuBar, BorderLayout.NORTH);
 
 		frame.add(pane, BorderLayout.CENTER);
@@ -166,6 +173,19 @@ public class UG4LuaEditor implements ActionListener {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				save(fileChooser.getSelectedFile());
 			}
+		}
+		if (src == ug4CompletionTxt) {
+			FileNameExtensionFilter ff = new FileNameExtensionFilter(
+					"UG4 completion text format", "txt");
+			fileChooser.setFileFilter(ff);
+			int returnVal = fileChooser.showOpenDialog(frame);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				profile.getState().setUg4CompletionTxt(
+						fileChooser.getSelectedFile().getAbsolutePath());
+				JOptionPane.showMessageDialog(frame,
+						"Close editor and restart to use setting.");
+			}
+			fileChooser.setFileFilter(luaFilefilter);
 		}
 	}
 

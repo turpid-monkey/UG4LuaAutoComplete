@@ -25,29 +25,55 @@
  */
 package edu.gcsc.vrl.lua.autocompletion;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import java.io.IOException;
 
-@XmlRootElement
-public class UG4EditorProfile {
+import edu.gcsc.vrl.BufferedLineReader;
 
-	private String ug4CompletionTxt;
-	String lastFile;
-	
-	
+public class RegFunctionDescription {
+	private String name;
+	private String returntype;
+	private String signature;
+	private String html;
 
-	public String getLastFile() {
-		return lastFile;
+	public static RegFunctionDescription read(BufferedLineReader f)
+			throws IOException {
+		RegFunctionDescription func = new RegFunctionDescription();
+		func.name = f.readLine();
+		func.returntype = f.readLine();
+		func.signature = f.readLine();
+		func.html = f.readLine();
+		return func;
 	}
 
-	public void setLastFile(String lastFile) {
-		this.lastFile = lastFile;
+	public String getName() {
+		return name;
 	}
 
-	public String getUg4CompletionTxt() {
-		return ug4CompletionTxt;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public void setUg4CompletionTxt(String ug4CompletionTxt) {
-		this.ug4CompletionTxt = ug4CompletionTxt;
+	public String getReturntype() {
+		return returntype;
+	}
+
+	public void setReturntype(String returntype) {
+		this.returntype = returntype;
+	}
+
+	public String getSignature() {
+		return signature;
+	}
+
+	public void setSignature(String signature) {
+		this.signature = signature;
+	}
+
+	public String getHtml() {
+		return html;
+	}
+
+	public void setHtml(String html) {
+		this.html = html;
 	}
 }

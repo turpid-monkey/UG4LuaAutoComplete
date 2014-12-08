@@ -25,77 +25,68 @@
  */
 package edu.gcsc.vrl.lua.autocompletion;
 
+import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
-import org.fife.ui.autocomplete.BasicCompletion;
 import org.fife.ui.autocomplete.Completion;
+import org.fife.ui.autocomplete.FunctionCompletion;
+import org.mism.forfife.CaretInfo;
 import org.mism.forfife.LuaCompletionProvider;
 
 public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 
-	List<Completion> ugCompletions;
+	UG4CompletionsLoader ug4loader = new UG4CompletionsLoader();;
+	List<Completion> staticCompletions = new ArrayList<Completion>();;
 
-	List<Completion> loadCompletions() {
+	protected void loadUg4CompletionsTxt(String file) {
+
 		try {
-			List<Completion> ugCompletions = new ArrayList<>();
-			JarFile jar = new JarFile("lib/VRL-UG-API.jar");
-			Enumeration<JarEntry> entries = jar.entries();
-			while (entries.hasMoreElements()) {
-				JarEntry entry = entries.nextElement();
-				if (entry.isDirectory())
-					continue;
-				String cls = entry.getName();
-				Completion c = createCompletionFromName(cls);
-				if (c != null) {
-					ugCompletions.add(c);
-				}
+			System.out.println("Loadung UG4 completions file: " + file);
+			ug4loader.load(new FileInputStream(file));
+			for (RegFunctionDescription fd : ug4loader.getFunctions()) {
+				FunctionCompletion fc = new FunctionCompletion(this,
+						fd.getName(), fd.getReturntype());
+				fc.setSummary(fd.getHtml());
+				fc.setShortDescription(fd.getSignature());
+				fc.setRelevance(2000);
+				staticCompletions.add(fc);
 			}
-			return ugCompletions;
-
 		} catch (Exception e) {
-			// throw new RuntimeException("Init LuaCompletionProvider failed.", e);
-			return new ArrayList<>();
+			System.out.println("Loading UG4 completions file failed: " + file);
+			e.printStackTrace();
 		}
-	}
-
-	Completion createCompletionFromName(String jarEntry) {
-		String name = jarEntry;
-		if (name.equals("MANIFEST.MF"))
-			return null;
-		if (name.equals("UG_Classes.groovy"))
-			return null;
-		if (name.contains("/")) {
-			int pos = name.lastIndexOf('/') + 1;
-			name = name.substring(pos);
-		}
-		name = name.replace(".class", "");
-		if (name.startsWith("C_")) {
-			name = name.substring(2);
-			return new BasicCompletion(this, name, "prefix C_", jarEntry);
-		} else if (name.startsWith("I_")) {
-			name = name.substring(2);
-			return new BasicCompletion(this, name, "prefix I_", jarEntry);
-		} else if (name.startsWith("F_")) {
-			name = name.substring(2);
-			return new BasicCompletion(this, name, "prefix F_", jarEntry);
-		} else if (name.startsWith("Const__")) {
-			name = name.substring(7);
-			if (name.startsWith("I_")) {
-				name = name.substring(2);
-				return new BasicCompletion(this, name, "prefix Const__I_", jarEntry);
-			}
-			return new BasicCompletion(this, name, "prefix Const__", jarEntry);
-		}
-		return new BasicCompletion(this, name, "class name", jarEntry);
 	}
 
 	@Override
-	protected void init() {
-		super.init();
-		ugCompletions = loadCompletions();
+	protected void fillCompletions(List<Completion> completions,
+			String luaScript, CaretInfo info) {
+		super.fillCompletions(completions, luaScript, info);
+		completions.addAll(staticCompletions);
+		for (String var : getTypeMap().keySet()) {
+			String type = getTypeMap().get(var);
+			if (ug4loader.getClasses().containsKey(type)) {
+				RegClassDescription cd = ug4loader.getClasses().get(type);
+				List<RegFunctionDescription> fds = new ArrayList<>(
+						cd.getMemberfunctions());
+				for (RegClassDescription parent : cd.getClassHierachy()) {
+					if (parent == null)
+						System.out
+								.println("Broken type hierarchy in class description for "
+										+ cd.getName());
+					else
+						fds.addAll(parent.getMemberfunctions());
+				}
+				for (RegFunctionDescription fd : fds) {
+					FunctionCompletion fc = new FunctionCompletion(this, var
+							+ ":" + fd.getName(), fd.getReturntype());
+					fc.setShortDescription(cd.getName() + ":"
+							+ fd.getSignature());
+					fc.setSummary(fd.getHtml());
+					fc.setRelevance(8000);
+					completions.add(fc);
+				}
+			}
+		}
 	}
 }

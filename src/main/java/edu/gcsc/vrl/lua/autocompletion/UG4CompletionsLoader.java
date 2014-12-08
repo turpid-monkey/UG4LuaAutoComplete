@@ -25,29 +25,54 @@
  */
 package edu.gcsc.vrl.lua.autocompletion;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-@XmlRootElement
-public class UG4EditorProfile {
+import edu.gcsc.vrl.BufferedLineReader;
 
-	private String ug4CompletionTxt;
-	String lastFile;
-	
-	
+public class UG4CompletionsLoader {
 
-	public String getLastFile() {
-		return lastFile;
+	public RegClassDescription resolveClass(String name) {
+		return classes.get(name);
 	}
 
-	public void setLastFile(String lastFile) {
-		this.lastFile = lastFile;
+	private Map<String, RegClassDescription> classes = new HashMap<>();
+	private List<RegFunctionDescription> functions = new ArrayList<>();
+
+	public Map<String, RegClassDescription> getClasses() {
+		return classes;
 	}
 
-	public String getUg4CompletionTxt() {
-		return ug4CompletionTxt;
+	public List<RegFunctionDescription> getFunctions() {
+		return functions;
 	}
 
-	public void setUg4CompletionTxt(String ug4CompletionTxt) {
-		this.ug4CompletionTxt = ug4CompletionTxt;
+	public void load(InputStream in) throws IOException {
+		load(new BufferedLineReader(new InputStreamReader(in)));
+	}
+
+	public void load(BufferedLineReader f) throws IOException {
+		String line = f.readLine();
+		if (!(line.equals("UG4COMPLETER VERSION 1")))
+			throw new IOException("Wrong file header: " + line);
+		while ((line = f.readLine()) != null) {
+			if (line.equals("class")) {
+				RegClassDescription regCls = RegClassDescription.read(f);
+				classes.put(regCls.getName(), regCls);
+			} else if (line.equals("function")) {
+				functions.add(RegFunctionDescription.read(f));
+			} else {
+				throw new IOException("Error at line " + f.getLineCounter()
+						+ ": unknown line " + line);
+			}
+		}
+		for (RegClassDescription c : classes.values()) {
+			c.setup(this);
+		}
 	}
 }
