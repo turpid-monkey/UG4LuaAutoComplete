@@ -16,6 +16,8 @@ In order to build this project, you need the following project in your (..)
 Special thanks go to Michael Hoffer, who supervised the creation of this project.
 Check out his great projects here https://github.com/miho.
 
+Major credits go to Martin Rupp for his contributions to this project.
+
 ----------------------
 
 License
