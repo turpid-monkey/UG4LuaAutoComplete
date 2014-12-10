@@ -38,13 +38,6 @@ public class RegClassDescription implements Comparable<RegClassDescription> {
 	private ArrayList<RegFunctionDescription> memberfunctions;
 	private ArrayList<RegFunctionDescription> constructors;
 
-	public void setup(UG4CompletionsLoader loader) {
-		this.classHierachy = new RegClassDescription[this.classHierachyStr.length];
-		for (int i = 0; i < this.classHierachyStr.length; ++i)
-			this.classHierachy[i] = loader
-					.resolveClass(this.classHierachyStr[i]);
-	}
-
 	static RegClassDescription read(BufferedLineReader f) throws IOException {
 		RegClassDescription descr = new RegClassDescription();
 		descr.memberfunctions = new ArrayList<>();
@@ -52,7 +45,11 @@ public class RegClassDescription implements Comparable<RegClassDescription> {
 
 		descr.name = f.readLine();
 		String line = f.readLine();
-		descr.classHierachyStr = line.split(" ");
+		if (line.trim().length() == 0) {
+			descr.classHierachyStr = new String[0];
+		} else {
+			descr.classHierachyStr = line.split(" ");
+		}
 		descr.html = f.readLine();
 
 		while ((line = f.readLine()) != null) {
@@ -119,7 +116,7 @@ public class RegClassDescription implements Comparable<RegClassDescription> {
 	public void setConstructors(ArrayList<RegFunctionDescription> constructors) {
 		this.constructors = constructors;
 	}
-	
+
 	public String getName() {
 		return name;
 	}

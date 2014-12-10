@@ -19,7 +19,7 @@ public class RegFunctionDescriptionTest {
 		RegFunctionDescription descr = RegFunctionDescription
 				.read(new BufferedLineReader(new StringReader(str)));
 
-		assertEquals("food", descr.getName());
+		assertEquals("foo", descr.getName());
 
 		assertEquals("void", descr.getReturntype());
 		assertEquals("void foo (size_t bar)", descr.getSignature());

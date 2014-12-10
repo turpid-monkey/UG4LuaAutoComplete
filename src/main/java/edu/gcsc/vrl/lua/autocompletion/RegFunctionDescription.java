@@ -29,7 +29,8 @@ import java.io.IOException;
 
 import edu.gcsc.vrl.BufferedLineReader;
 
-public class RegFunctionDescription {
+public class RegFunctionDescription implements
+		Comparable<RegFunctionDescription> {
 	private String name;
 	private String returntype;
 	private String signature;
@@ -75,5 +76,13 @@ public class RegFunctionDescription {
 
 	public void setHtml(String html) {
 		this.html = html;
+	}
+
+	@Override
+	public int compareTo(RegFunctionDescription o) {
+		if (this.name.equals(o.name)) {
+			return signature.compareTo(o.signature);
+		}
+		return name.compareTo(o.name);
 	}
 }

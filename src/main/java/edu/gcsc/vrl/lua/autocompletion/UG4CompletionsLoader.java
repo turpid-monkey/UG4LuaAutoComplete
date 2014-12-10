@@ -28,10 +28,10 @@ package edu.gcsc.vrl.lua.autocompletion;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import edu.gcsc.vrl.BufferedLineReader;
 
@@ -42,13 +42,13 @@ public class UG4CompletionsLoader {
 	}
 
 	private Map<String, RegClassDescription> classes = new HashMap<>();
-	private List<RegFunctionDescription> functions = new ArrayList<>();
+	private Set<RegFunctionDescription> functions = new TreeSet<>();
 
 	public Map<String, RegClassDescription> getClasses() {
 		return classes;
 	}
 
-	public List<RegFunctionDescription> getFunctions() {
+	public Set<RegFunctionDescription> getFunctions() {
 		return functions;
 	}
 
@@ -72,7 +72,20 @@ public class UG4CompletionsLoader {
 			}
 		}
 		for (RegClassDescription c : classes.values()) {
-			c.setup(this);
+			c.setClassHierachy(new RegClassDescription[c.getClassHierachyStr().length]);
+			for (int i = 0; i < c.getClassHierachyStr().length; ++i) {
+				RegClassDescription parent = resolveClass(c
+						.getClassHierachyStr()[i]);
+				if (parent == null) {
+					// friendly failure here, just add a "unresolved" entry to classes
+					parent = new RegClassDescription();
+					parent.setName(c.getClassHierachyStr()[i]);
+					parent.setHtml("<b>Unresolved parent class.");
+					classes.put(parent.getName(), parent);
+				}
+				c.getClassHierachy()[i] = parent;
+			}
 		}
+
 	}
 }

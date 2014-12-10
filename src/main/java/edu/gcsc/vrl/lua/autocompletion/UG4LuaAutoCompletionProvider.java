@@ -42,7 +42,7 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 	protected void loadUg4CompletionsTxt(String file) {
 
 		try {
-			System.out.println("Loadung UG4 completions file: " + file);
+			System.out.println("Loading UG4 completions file: " + file);
 			ug4loader.load(new FileInputStream(file));
 			for (RegFunctionDescription fd : ug4loader.getFunctions()) {
 				FunctionCompletion fc = new FunctionCompletion(this,

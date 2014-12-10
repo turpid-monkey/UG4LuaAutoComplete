@@ -34,5 +34,24 @@ public class RegClassDescriptionTest {
 		assertEquals(1, descr.getMemberfunctions().size());
 		assertEquals(1, descr.getConstructors().size());
 	}
+	
+	@Test
+	public void readEmptyClassHierarchy() throws IOException
+	{
+		String str = "ClassName\n" + "\n"
+				+ "<p>some class-level Html\n" + "constructor\n"
+						+ "create\n"
+						+ "void\n"
+						+ "void create (size_t init)\n"
+						+ "<p>some constructor level html\n"
+						+ "memberfunction\n" + "foo\n"
+				+ "void\n" + "void foo (size_t bar)\n"
+				+ "<p>some function level html\n" + ";";
+		
+		RegClassDescription descr = RegClassDescription
+				.read(new BufferedLineReader(new StringReader(str)));
+		
+		assertEquals(0, descr.getClassHierachyStr().length);
+	}
 
 }
