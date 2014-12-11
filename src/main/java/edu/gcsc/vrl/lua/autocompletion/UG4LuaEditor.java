@@ -45,6 +45,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.fife.ui.autocomplete.AutoCompletion;
@@ -62,7 +63,7 @@ import edu.gcsc.vrl.StateFile;
  */
 public class UG4LuaEditor implements ActionListener {
 
-	JMenuItem open, save, ug4CompletionTxt;
+	JMenuItem open, save, ug4CompletionTxt, ug4Root;
 	JFrame frame;
 	JFileChooser fileChooser;
 	RSyntaxTextArea textArea;
@@ -71,10 +72,10 @@ public class UG4LuaEditor implements ActionListener {
 			UG4EditorProfile.class);
 	FileNameExtensionFilter luaFilefilter = new FileNameExtensionFilter(
 			"LUA Source files", "lua");
+	UG4LuaAutoCompletionProvider prov;
 
 	private void createSwingContent() {
 		fileChooser = new JFileChooser();
-		
 		fileChooser.setFileFilter(luaFilefilter);
 
 		frame = new JFrame("UG 4 LUA Editor V0.1a");
@@ -98,8 +99,9 @@ public class UG4LuaEditor implements ActionListener {
 		textArea.setCodeFoldingEnabled(true);
 		textArea.setAntiAliasingEnabled(true);
 
-		UG4LuaAutoCompletionProvider prov = new UG4LuaAutoCompletionProvider();
+		prov = new UG4LuaAutoCompletionProvider();
 		prov.loadUg4CompletionsTxt(profile.getState().getUg4CompletionTxt());
+		prov.setUg4Root(profile.getState().getUg4Root());
 		AutoCompletion ac = new AutoCompletion(prov);
 		ac.setShowDescWindow(true);
 		ac.install(textArea);
@@ -113,13 +115,16 @@ public class UG4LuaEditor implements ActionListener {
 		open = new JMenuItem("Open...");
 		save = new JMenuItem("Save");
 		ug4CompletionTxt = new JMenuItem("Set ugCompletion.txt");
+		ug4Root = new JMenuItem("Set UG root folder");
 		menu.add(open);
 		menu.add(save);
 		menu.addSeparator();
 		menu.add(ug4CompletionTxt);
+		menu.add(ug4Root);
 		open.addActionListener(this);
 		save.addActionListener(this);
 		ug4CompletionTxt.addActionListener(this);
+		ug4Root.addActionListener(this);
 		frame.add(menuBar, BorderLayout.NORTH);
 
 		frame.add(pane, BorderLayout.CENTER);
@@ -180,6 +185,27 @@ public class UG4LuaEditor implements ActionListener {
 						fileChooser.getSelectedFile().getAbsolutePath());
 				JOptionPane.showMessageDialog(frame,
 						"Close editor and restart to use setting.");
+			}
+			fileChooser.setFileFilter(luaFilefilter);
+		}
+		if (src == ug4Root) {
+			fileChooser.setFileFilter(new FileFilter() {
+
+				@Override
+				public String getDescription() {
+					return "UG Root Folder";
+				}
+
+				@Override
+				public boolean accept(File f) {
+					return f.isDirectory() && new File(f, "scripts").exists();
+				}
+			});
+			int returnVal = fileChooser.showOpenDialog(frame);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				String file = fileChooser.getSelectedFile().getAbsolutePath();
+				profile.getState().setUg4Root(file);
+				prov.setUg4Root(file);
 			}
 			fileChooser.setFileFilter(luaFilefilter);
 		}

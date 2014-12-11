@@ -31,9 +31,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class UG4EditorProfile {
 
 	private String ug4CompletionTxt;
+	private String ug4Root;
 	String lastFile;
-	
-	
+
+	public String getUg4Root() {
+		return ug4Root;
+	}
+
+	public void setUg4Root(String ug4Root) {
+		this.ug4Root = ug4Root;
+	}
 
 	public String getLastFile() {
 		return lastFile;

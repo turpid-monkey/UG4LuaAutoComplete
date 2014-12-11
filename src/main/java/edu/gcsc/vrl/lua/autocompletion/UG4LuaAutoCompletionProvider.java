@@ -33,11 +33,18 @@ import org.fife.ui.autocomplete.Completion;
 import org.fife.ui.autocomplete.FunctionCompletion;
 import org.mism.forfife.CaretInfo;
 import org.mism.forfife.LuaCompletionProvider;
+import org.mism.forfife.LuaResourceLoader;
+import org.mism.forfife.visitors.LuaCompletionVisitor;
 
 public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 
-	UG4CompletionsLoader ug4loader = new UG4CompletionsLoader();;
-	List<Completion> staticCompletions = new ArrayList<Completion>();;
+	UG4CompletionsLoader ug4loader = new UG4CompletionsLoader();
+	List<Completion> staticCompletions = new ArrayList<Completion>();
+	UGResourceLoader loader;
+	
+	public void setUg4Root(String ug4Root) {
+		loader.setUg4Root(ug4Root);
+	}
 
 	protected void loadUg4CompletionsTxt(String file) {
 
@@ -56,6 +63,19 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 			System.out.println("Loading UG4 completions file failed: " + file);
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	protected void fillResourceLoaders(List<LuaResourceLoader> loaders) {
+		loader = new UGResourceLoader();
+		loaders.add(loader);
+		super.fillResourceLoaders(loaders);
+	}
+
+	@Override
+	protected void fillVisitors(List<LuaCompletionVisitor> visitors) {
+		visitors.add(new UGLoadScriptVisitor());
+		super.fillVisitors(visitors);
 	}
 
 	@Override
