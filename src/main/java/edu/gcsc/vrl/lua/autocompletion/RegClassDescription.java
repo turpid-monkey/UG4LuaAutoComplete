@@ -40,8 +40,8 @@ public class RegClassDescription implements Comparable<RegClassDescription> {
 
 	static RegClassDescription read(BufferedLineReader f) throws IOException {
 		RegClassDescription descr = new RegClassDescription();
-		descr.memberfunctions = new ArrayList<>();
-		descr.constructors = new ArrayList<>();
+		descr.memberfunctions = new ArrayList<RegFunctionDescription>();
+		descr.constructors = new ArrayList<RegFunctionDescription>();
 
 		descr.name = f.readLine();
 		String line = f.readLine();
@@ -53,18 +53,17 @@ public class RegClassDescription implements Comparable<RegClassDescription> {
 		descr.html = f.readLine();
 
 		while ((line = f.readLine()) != null) {
-			switch (line) {
-			case ";":
+			if (";".equals(line)) {
 				return descr;
-			case "memberfunction":
+			} else if ("memberfunction".equals(line)) {
 				descr.memberfunctions.add(RegFunctionDescription.read(f));
-				break;
-			case "constructor":
+			} else if ("constructor".equals(line)) {
 				descr.constructors.add(RegFunctionDescription.read(f));
-				break;
-			default:
+			} else if ("".equals(line.trim())) {
+				// let's ignore empty lines gracefully for now
+			} else {
 				throw new IOException("error at line " + f.getLineCounter()
-						+ ": unknown line " + " in class def");
+						+ ": unknown line '" + line + "' in class def");
 			}
 		}
 		throw new IOException(

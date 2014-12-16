@@ -8,28 +8,64 @@ import org.mism.forfife.res.FileResourceLoader;
 
 public class UGResourceLoader implements LuaResourceLoader {
 
-	File ug4Root;
+	static File ug4Root;
+	static File currentDir;
 
-	public void setUg4Root(String ug4Root) {
-		File f = new File(ug4Root);
-		if (!f.exists() || !new File(f, "scripts").exists())
-			throw new IllegalArgumentException("Invalid UG root folder: " + f);
-		this.ug4Root = f;
+	LuaResource resource;
+	long lastModified;
+	File file;
+
+	@Override
+	public void setResource(LuaResource resource) {
+		this.resource = resource;
+		String fileName = resource
+				.getResourceLink().substring(3);
+		file = new File(new File(ug4Root, "scripts"), fileName);
+		if (!file.exists())
+		{
+			file = new File(currentDir, fileName);
+		}
+		lastModified = file.lastModified();
+	}
+	
+	@Override
+	public LuaResource getResource() {
+		return resource;
 	}
 
-	public File getUg4Root() {
+	public static void setUg4Root(String path) {
+		File f = new File(path);
+		if (!f.exists() || !new File(f, "scripts").exists())
+			throw new IllegalArgumentException("Invalid UG root folder: " + f);
+		ug4Root = f;
+	}
+	
+	public static void setCurrentDir(String dir)
+	{
+		File f = new File(dir);
+		if (!f.exists() || !f.isDirectory())
+			throw new IllegalArgumentException("Invalid working dir: " + f);
+		currentDir = f;
+		
+	}
+
+	public static File getUg4Root() {
 		return ug4Root;
 	}
 
 	@Override
-	public boolean canLoad(LuaResource res) {
-		return res.getResourceLink().startsWith("ug:");
+	public boolean canLoad() {
+		return resource.getResourceLink().startsWith("ug:");
 	}
 
 	@Override
-	public String load(LuaResource res) throws Exception {
-		File file = new File(new File(ug4Root,"scripts"), res.getResourceLink().substring(3));
+	public String load() throws Exception {
 		return FileResourceLoader.load(file);
+	}
+
+	@Override
+	public boolean hasModifications() {
+		return lastModified < file.lastModified();
 	}
 
 }

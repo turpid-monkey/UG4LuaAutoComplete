@@ -17,7 +17,7 @@ public class UGLoadScriptVisitor extends LuaCompletionVisitor {
 							.replace("\"", "").trim();
 			if (!resourceLink.contains("..")) {
 				LuaResource res = new LuaResource(resourceLink);
-				info.getDependentResources().add(res);
+				info.getIncludedResources().add(res);
 			}
 		}
 		return super.visitFunctioncall(ctx);

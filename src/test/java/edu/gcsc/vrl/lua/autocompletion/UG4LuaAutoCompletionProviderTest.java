@@ -1,8 +1,5 @@
 package edu.gcsc.vrl.lua.autocompletion;
 
-import java.util.List;
-
-import org.fife.ui.autocomplete.Completion;
 import org.junit.Test;
 
 public class UG4LuaAutoCompletionProviderTest {

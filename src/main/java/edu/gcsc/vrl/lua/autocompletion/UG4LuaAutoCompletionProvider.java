@@ -40,10 +40,14 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 
 	UG4CompletionsLoader ug4loader = new UG4CompletionsLoader();
 	List<Completion> staticCompletions = new ArrayList<Completion>();
-	UGResourceLoader loader;
 	
 	public void setUg4Root(String ug4Root) {
-		loader.setUg4Root(ug4Root);
+		UGResourceLoader.setUg4Root(ug4Root);
+	}
+	
+	public void setCurrentDir(String dir)
+	{
+		UGResourceLoader.setCurrentDir(dir);
 	}
 
 	protected void loadUg4CompletionsTxt(String file) {
@@ -60,18 +64,18 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 				staticCompletions.add(fc);
 			}
 		} catch (Exception e) {
-			System.out.println("Loading UG4 completions file failed: " + file);
-			e.printStackTrace();
+			System.out.println("Loading UG4 completions file failed: " + e.getMessage());
 		}
 	}
 
+	
 	@Override
-	protected void fillResourceLoaders(List<LuaResourceLoader> loaders) {
-		loader = new UGResourceLoader();
-		loaders.add(loader);
+	protected void fillResourceLoaders(
+			List<Class<? extends LuaResourceLoader>> loaders) {
 		super.fillResourceLoaders(loaders);
+		loaders.add(UGResourceLoader.class);
 	}
-
+	
 	@Override
 	protected void fillVisitors(List<LuaCompletionVisitor> visitors) {
 		visitors.add(new UGLoadScriptVisitor());
@@ -87,7 +91,7 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 			String type = getTypeMap().get(var);
 			if (ug4loader.getClasses().containsKey(type)) {
 				RegClassDescription cd = ug4loader.getClasses().get(type);
-				List<RegFunctionDescription> fds = new ArrayList<>(
+				List<RegFunctionDescription> fds = new ArrayList<RegFunctionDescription>(
 						cd.getMemberfunctions());
 				for (RegClassDescription parent : cd.getClassHierachy()) {
 					if (parent == null)

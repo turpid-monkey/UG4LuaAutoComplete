@@ -41,8 +41,8 @@ public class UG4CompletionsLoader {
 		return classes.get(name);
 	}
 
-	private Map<String, RegClassDescription> classes = new HashMap<>();
-	private Set<RegFunctionDescription> functions = new TreeSet<>();
+	private Map<String, RegClassDescription> classes = new HashMap<String, RegClassDescription>();
+	private Set<RegFunctionDescription> functions = new TreeSet<RegFunctionDescription>();
 
 	public Map<String, RegClassDescription> getClasses() {
 		return classes;

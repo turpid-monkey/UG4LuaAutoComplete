@@ -17,8 +17,8 @@ public class VisitorTests {
 		UGLoadScriptVisitor visitor = new UGLoadScriptVisitor();
 		visitor.setInfo(info);
 		visitor.visit(ctx);
-		assertEquals(1, info.getDependentResources().size());
-		assertEquals("ug:ug_util.lua", info.getDependentResources().iterator()
+		assertEquals(1, info.getIncludedResources().size());
+		assertEquals("ug:ug_util.lua", info.getIncludedResources().iterator()
 				.next().getResourceLink());
 	}
 	
@@ -31,6 +31,6 @@ public class VisitorTests {
 		UGLoadScriptVisitor visitor = new UGLoadScriptVisitor();
 		visitor.setInfo(info);
 		visitor.visit(ctx);
-		assertEquals(0, info.getDependentResources().size());
+		assertEquals(0, info.getIncludedResources().size());
 	}
 }

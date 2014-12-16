@@ -45,7 +45,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.fife.ui.autocomplete.AutoCompletion;
@@ -100,8 +99,21 @@ public class UG4LuaEditor implements ActionListener {
 		textArea.setAntiAliasingEnabled(true);
 
 		prov = new UG4LuaAutoCompletionProvider();
-		prov.loadUg4CompletionsTxt(profile.getState().getUg4CompletionTxt());
-		prov.setUg4Root(profile.getState().getUg4Root());
+		try {
+			prov.loadUg4CompletionsTxt(profile.getState().getUg4CompletionTxt());
+		} catch (Exception e) {
+			System.out
+					.println("Settings for ugCompletion.txt are missing or contain errors: "
+							+ e.getMessage());
+		}
+
+		try {
+			prov.setUg4Root(profile.getState().getUg4Root());
+		} catch (Exception e) {
+			System.out
+					.println("Settings for UG_ROOT are missing or contain errors: "
+							+ e.getMessage());
+		}
 		AutoCompletion ac = new AutoCompletion(prov);
 		ac.setShowDescWindow(true);
 		ac.install(textArea);
@@ -181,33 +193,36 @@ public class UG4LuaEditor implements ActionListener {
 			fileChooser.setFileFilter(ff);
 			int returnVal = fileChooser.showOpenDialog(frame);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				profile.getState().setUg4CompletionTxt(
-						fileChooser.getSelectedFile().getAbsolutePath());
-				JOptionPane.showMessageDialog(frame,
-						"Close editor and restart to use setting.");
+				try {
+					prov.loadUg4CompletionsTxt(fileChooser.getSelectedFile()
+							.getAbsolutePath());
+					profile.getState().setUg4CompletionTxt(
+							fileChooser.getSelectedFile().getAbsolutePath());
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(
+							frame,
+							"Could not load or parse selected file: "
+									+ e.getMessage());
+				}
+
 			}
 			fileChooser.setFileFilter(luaFilefilter);
 		}
 		if (src == ug4Root) {
-			fileChooser.setFileFilter(new FileFilter() {
-
-				@Override
-				public String getDescription() {
-					return "UG Root Folder";
-				}
-
-				@Override
-				public boolean accept(File f) {
-					return f.isDirectory() && new File(f, "scripts").exists();
-				}
-			});
-			int returnVal = fileChooser.showOpenDialog(frame);
+			JFileChooser dirChooser = new JFileChooser();
+			dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			int returnVal = dirChooser.showOpenDialog(frame);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				String file = fileChooser.getSelectedFile().getAbsolutePath();
-				profile.getState().setUg4Root(file);
-				prov.setUg4Root(file);
+				String file = dirChooser.getSelectedFile().getAbsolutePath();
+				try {
+					prov.setUg4Root(file);
+					profile.getState().setUg4Root(file);
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(frame,
+							"Could not set UG_ROOT: " + e.getMessage());
+				}
+
 			}
-			fileChooser.setFileFilter(luaFilefilter);
 		}
 	}
 
@@ -226,6 +241,7 @@ public class UG4LuaEditor implements ActionListener {
 			str.close();
 			frame.setTitle(file.getName());
 			profile.getState().setLastFile(file.getAbsolutePath());
+			prov.setCurrentDir(file.getParent());
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(frame,
 					"Could not load file.\n" + e.getMessage());
