@@ -32,6 +32,7 @@ import java.util.List;
 import org.fife.ui.autocomplete.Completion;
 import org.fife.ui.autocomplete.FunctionCompletion;
 import org.mism.forfife.CaretInfo;
+import org.mism.forfife.IconLib;
 import org.mism.forfife.LuaCompletionProvider;
 import org.mism.forfife.LuaResourceLoader;
 import org.mism.forfife.visitors.LuaCompletionVisitor;
@@ -40,13 +41,12 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 
 	UG4CompletionsLoader ug4loader = new UG4CompletionsLoader();
 	List<Completion> staticCompletions = new ArrayList<Completion>();
-	
+
 	public void setUg4Root(String ug4Root) {
 		UGResourceLoader.setUg4Root(ug4Root);
 	}
-	
-	public void setCurrentDir(String dir)
-	{
+
+	public void setCurrentDir(String dir) {
 		UGResourceLoader.setCurrentDir(dir);
 	}
 
@@ -58,24 +58,25 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 			for (RegFunctionDescription fd : ug4loader.getFunctions()) {
 				FunctionCompletion fc = new FunctionCompletion(this,
 						fd.getName(), fd.getReturntype());
-				fc.setSummary(fd.getHtml());
-				fc.setShortDescription(fd.getSignature());
+				fc.setShortDescription(fd.getHtml());
+				//fc.setShortDescription(fd.getSignature());
 				fc.setRelevance(2000);
+				fc.setIcon(IconLib.instance().getLibraryIcon());
 				staticCompletions.add(fc);
 			}
 		} catch (Exception e) {
-			System.out.println("Loading UG4 completions file failed: " + e.getMessage());
+			System.out.println("Loading UG4 completions file failed: "
+					+ e.getMessage());
 		}
 	}
 
-	
 	@Override
 	protected void fillResourceLoaders(
 			List<Class<? extends LuaResourceLoader>> loaders) {
 		super.fillResourceLoaders(loaders);
 		loaders.add(UGResourceLoader.class);
 	}
-	
+
 	@Override
 	protected void fillVisitors(List<LuaCompletionVisitor> visitors) {
 		visitors.add(new UGLoadScriptVisitor());
@@ -84,31 +85,34 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 
 	@Override
 	protected void fillCompletions(List<Completion> completions,
-			String luaScript, CaretInfo info) {
-		super.fillCompletions(completions, luaScript, info);
+			String alreadyEntered, CaretInfo info) {
+		super.fillCompletions(completions, alreadyEntered, info);
 		completions.addAll(staticCompletions);
 		for (String var : getTypeMap().keySet()) {
-			String type = getTypeMap().get(var);
-			if (ug4loader.getClasses().containsKey(type)) {
-				RegClassDescription cd = ug4loader.getClasses().get(type);
-				List<RegFunctionDescription> fds = new ArrayList<RegFunctionDescription>(
-						cd.getMemberfunctions());
-				for (RegClassDescription parent : cd.getClassHierachy()) {
-					if (parent == null)
-						System.out
-								.println("Broken type hierarchy in class description for "
-										+ cd.getName());
-					else
-						fds.addAll(parent.getMemberfunctions());
-				}
-				for (RegFunctionDescription fd : fds) {
-					FunctionCompletion fc = new FunctionCompletion(this, var
-							+ ":" + fd.getName(), fd.getReturntype());
-					fc.setShortDescription(cd.getName() + ":"
-							+ fd.getSignature());
-					fc.setSummary(fd.getHtml());
-					fc.setRelevance(8000);
-					completions.add(fc);
+			if (var.startsWith(alreadyEntered) || alreadyEntered.startsWith(var)) {
+				String type = getTypeMap().get(var);
+				if (ug4loader.getClasses().containsKey(type)) {
+					RegClassDescription cd = ug4loader.getClasses().get(type);
+					List<RegFunctionDescription> fds = new ArrayList<RegFunctionDescription>(
+							cd.getMemberfunctions());
+					for (RegClassDescription parent : cd.getClassHierachy()) {
+						if (parent == null)
+							System.out
+									.println("Broken type hierarchy in class description for "
+											+ cd.getName());
+						else
+							fds.addAll(parent.getMemberfunctions());
+					}
+					for (RegFunctionDescription fd : fds) {
+						FunctionCompletion fc = new FunctionCompletion(this,
+								var + ":" + fd.getName(), fd.getReturntype());
+						fc.setShortDescription(cd.getName() + ":"
+								+ fd.getSignature());
+						fc.setSummary(fd.getHtml());
+						fc.setRelevance(8000);
+						fc.setIcon(IconLib.instance().getMemberFunctionIcon());
+						completions.add(fc);
+					}
 				}
 			}
 		}

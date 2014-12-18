@@ -48,6 +48,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.fife.ui.autocomplete.AutoCompletion;
+import org.fife.ui.autocomplete.CompletionCellRenderer;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager;
@@ -117,6 +118,7 @@ public class UG4LuaEditor implements ActionListener {
 		AutoCompletion ac = new AutoCompletion(prov);
 		ac.setShowDescWindow(true);
 		ac.install(textArea);
+		ac.setListCellRenderer(new CompletionCellRenderer());
 
 		pane = new RTextScrollPane(textArea);
 		pane.setFoldIndicatorEnabled(true);
