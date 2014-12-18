@@ -3,7 +3,7 @@ apply plugin: 'application'
 
 mainClassName = 'edu.gcsc.vrl.lua.autocompletion.UG4LuaEditor'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 1.6
 version = '0.1'
 
 jar {
