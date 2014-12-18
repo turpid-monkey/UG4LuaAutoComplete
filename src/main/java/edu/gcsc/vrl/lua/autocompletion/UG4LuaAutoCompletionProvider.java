@@ -28,13 +28,18 @@ package edu.gcsc.vrl.lua.autocompletion;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.fife.ui.autocomplete.Completion;
 import org.fife.ui.autocomplete.FunctionCompletion;
 import org.mism.forfife.CaretInfo;
 import org.mism.forfife.IconLib;
 import org.mism.forfife.LuaCompletionProvider;
+import org.mism.forfife.LuaResource;
 import org.mism.forfife.LuaResourceLoader;
+import org.mism.forfife.LuaSyntaxAnalyzer;
+import org.mism.forfife.LuaSyntaxAnalyzerTest;
+import org.mism.forfife.LuaSyntaxInfo;
 import org.mism.forfife.visitors.LuaCompletionVisitor;
 
 public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
@@ -59,7 +64,7 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 				FunctionCompletion fc = new FunctionCompletion(this,
 						fd.getName(), fd.getReturntype());
 				fc.setShortDescription(fd.getHtml());
-				//fc.setShortDescription(fd.getSignature());
+				// fc.setShortDescription(fd.getSignature());
 				fc.setRelevance(2000);
 				fc.setIcon(IconLib.instance().getLibraryIcon());
 				staticCompletions.add(fc);
@@ -84,12 +89,14 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 	}
 
 	@Override
-	protected void fillCompletions(List<Completion> completions,
-			String alreadyEntered, CaretInfo info) {
-		super.fillCompletions(completions, alreadyEntered, info);
+	protected void fillCompletions(LuaSyntaxAnalyzer root,
+			Map<LuaResource, LuaSyntaxInfo> includes,
+			List<Completion> completions, String alreadyEntered, CaretInfo info) {
+		super.fillCompletions(root, includes, completions, alreadyEntered, info);
 		completions.addAll(staticCompletions);
 		for (String var : getTypeMap().keySet()) {
-			if (var.startsWith(alreadyEntered) || alreadyEntered.startsWith(var)) {
+			if (var.startsWith(alreadyEntered)
+					|| alreadyEntered.startsWith(var)) {
 				String type = getTypeMap().get(var);
 				if (ug4loader.getClasses().containsKey(type)) {
 					RegClassDescription cd = ug4loader.getClasses().get(type);
