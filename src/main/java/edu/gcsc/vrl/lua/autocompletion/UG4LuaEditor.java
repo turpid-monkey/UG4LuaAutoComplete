@@ -57,10 +57,6 @@ import org.mism.forfife.LuaFoldParser;
 
 import edu.gcsc.vrl.StateFile;
 
-/**
- *
- * @author tr1nergy
- */
 public class UG4LuaEditor implements ActionListener {
 
 	JMenuItem open, save, ug4CompletionTxt, ug4Root;

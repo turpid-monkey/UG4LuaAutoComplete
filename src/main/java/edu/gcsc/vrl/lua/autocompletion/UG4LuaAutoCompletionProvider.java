@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.fife.ui.autocomplete.BasicCompletion;
 import org.fife.ui.autocomplete.Completion;
 import org.fife.ui.autocomplete.FunctionCompletion;
 import org.mism.forfife.CaretInfo;
@@ -38,7 +39,6 @@ import org.mism.forfife.LuaCompletionProvider;
 import org.mism.forfife.LuaResource;
 import org.mism.forfife.LuaResourceLoader;
 import org.mism.forfife.LuaSyntaxAnalyzer;
-import org.mism.forfife.LuaSyntaxAnalyzerTest;
 import org.mism.forfife.LuaSyntaxInfo;
 import org.mism.forfife.visitors.LuaCompletionVisitor;
 
@@ -94,6 +94,16 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 			List<Completion> completions, String alreadyEntered, CaretInfo info) {
 		super.fillCompletions(root, includes, completions, alreadyEntered, info);
 		completions.addAll(staticCompletions);
+		// TODO the following two sets of completions can be added to the static completions list
+		completions.addAll(UGResourceLoader.createUGLoadScriptCompletions(this));
+		for (RegClassDescription cls : ug4loader.getClasses().values())
+		{
+			BasicCompletion bc = new BasicCompletion(this, cls.getName());
+			bc.setSummary(cls.getHtml());
+			bc.setRelevance(100);
+			completions.add(bc);
+		}
+		
 		for (String var : getTypeMap().keySet()) {
 			if (var.startsWith(alreadyEntered)
 					|| alreadyEntered.startsWith(var)) {

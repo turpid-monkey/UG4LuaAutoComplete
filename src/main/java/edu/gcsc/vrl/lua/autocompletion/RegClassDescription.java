@@ -30,6 +30,10 @@ import java.util.ArrayList;
 
 import edu.gcsc.vrl.BufferedLineReader;
 
+/**
+ * 
+ * @author Martin Rupp
+ */
 public class RegClassDescription implements Comparable<RegClassDescription> {
 	private String name;
 	private String html;

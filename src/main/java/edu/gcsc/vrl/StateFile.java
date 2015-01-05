@@ -34,8 +34,6 @@ import javax.xml.bind.Unmarshaller;
 
 /**
  * Automatically loads a JAXB persisted object at initialization.
- * 
- * @author tr1nergy
  *
  * @param <State>
  *            the class of the persisted object.

@@ -29,6 +29,10 @@ import java.io.IOException;
 
 import edu.gcsc.vrl.BufferedLineReader;
 
+/**
+ * 
+ * @author Martin Rupp
+ */
 public class RegFunctionDescription implements
 		Comparable<RegFunctionDescription> {
 	private String name;

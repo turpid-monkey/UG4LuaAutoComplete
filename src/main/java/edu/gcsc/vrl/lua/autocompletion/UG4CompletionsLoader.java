@@ -34,7 +34,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import edu.gcsc.vrl.BufferedLineReader;
-
+/**
+ * 
+ * @author Martin Rupp
+ */
 public class UG4CompletionsLoader {
 
 	public RegClassDescription resolveClass(String name) {

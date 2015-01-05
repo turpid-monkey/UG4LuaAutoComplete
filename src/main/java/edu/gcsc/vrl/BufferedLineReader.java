@@ -29,6 +29,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 
+/**
+ * Simple implementation of a buffered reader that keeps track of the lines read.
+ *
+ */
 public class BufferedLineReader extends BufferedReader {
 
 	private int lineCounter = 0;
