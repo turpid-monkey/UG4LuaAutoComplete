@@ -3,9 +3,10 @@ package edu.gcsc.vrl.lua.autocompletion;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.mism.forfife.LuaParseTreeUtil;
-import org.mism.forfife.LuaSyntaxInfo;
-import org.mism.forfife.lua.LuaParser.ChunkContext;
+
+import edu.gcsc.lua.LuaParseTreeUtil;
+import edu.gcsc.lua.LuaSyntaxInfo;
+import edu.gcsc.lua.grammar.LuaParser.ChunkContext;
 
 public class VisitorTests {
 

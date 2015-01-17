@@ -25,12 +25,11 @@
  */
 package edu.gcsc.vrl.lua.autocompletion;
 
-import static org.mism.forfife.LuaParseTreeUtil.next;
-import static org.mism.forfife.LuaParseTreeUtil.start;
-
-import org.mism.forfife.LuaResource;
-import org.mism.forfife.lua.LuaParser.FunctioncallContext;
-import org.mism.forfife.visitors.LuaCompletionVisitor;
+import static edu.gcsc.lua.LuaParseTreeUtil.next;
+import static edu.gcsc.lua.LuaParseTreeUtil.start;
+import edu.gcsc.lua.LuaResource;
+import edu.gcsc.lua.grammar.LuaParser.FunctioncallContext;
+import edu.gcsc.lua.visitors.LuaCompletionVisitor;
 
 public class UGLoadScriptVisitor extends LuaCompletionVisitor {
 

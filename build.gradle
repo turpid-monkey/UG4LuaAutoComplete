@@ -1,14 +1,16 @@
 apply plugin: 'java'
 apply plugin: 'application'
+apply plugin: 'eclipse'
 
 mainClassName = 'edu.gcsc.vrl.lua.autocompletion.UG4LuaEditor'
 
+group = 'edu.gcsc.uglua'
 sourceCompatibility = 1.6
 version = '0.1'
 
 jar {
     manifest {
-        attributes 'Implementation-Title': 'Lua Auto-completion for UG4 shell', 'Implementation-Version': version
+        attributes 'Implementation-Title': 'Lua auto-completion library for UG4 shell', 'Implementation-Version': version
     }
 }
 
@@ -29,7 +31,12 @@ repositories {
     maven {
         name 'jcenter'
         url  'http://jcenter.bintray.com'
-    }    
+    } 
+    
+    maven {
+        name 'turpid monkeys' 
+        url 'https://dl.bintray.com/turpid-monkey/maven'
+    }   
 }
       
 buildscript {
@@ -44,8 +51,10 @@ buildscript {
 dependencies {
     compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
     testCompile group: 'junit', name: 'junit', version: '4.10'
+    
+    
 
-    compile project(':luaautocomplete')
+    compile group: 'edu.gcsc.lua', name: 'luaautocomplete', version: '0.1'
 }
 
 uploadArchives {

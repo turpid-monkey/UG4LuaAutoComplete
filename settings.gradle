@@ -1,4 +1,1 @@
 rootProject.name = 'ug4luaautocomplete'
-
-include 'luaautocomplete'
-project(':luaautocomplete').projectDir = new File(settingsDir, '../LuaAutoComplete')
