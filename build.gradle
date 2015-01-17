@@ -4,8 +4,6 @@ apply plugin: 'eclipse'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'maven-publish'
 
-mainClassName = 'edu.gcsc.vrl.lua.autocompletion.UG4LuaEditor'
-
 group = 'edu.gcsc.uglua'
 sourceCompatibility = 1.6
 version = '0.1'
@@ -31,7 +29,7 @@ artifacts {
 
 bintray {
     user = "turpid-monkey"
-    key = "3227f8100c9250a6b02a530b67486836d95cfa60"
+    key = ""
     publications = ['mavenJava'] 
     publish = true
     pkg {
