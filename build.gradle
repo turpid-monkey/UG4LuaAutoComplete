@@ -1,6 +1,8 @@
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'eclipse'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
 
 mainClassName = 'edu.gcsc.vrl.lua.autocompletion.UG4LuaEditor'
 
@@ -14,8 +16,50 @@ jar {
     }
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '2.1'
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+bintray {
+    user = "turpid-monkey"
+    key = "3227f8100c9250a6b02a530b67486836d95cfa60"
+    publications = ['mavenJava'] 
+    publish = true
+    pkg {
+        repo = 'maven'
+        name = 'edu.gcsc.uglua'
+        desc = 'A library to generate UGShell specific auto-completion proposals from UGShell/LUA scripts.'
+        websiteUrl = 'https://github.com/turpid-monkey/UG4LuaAutoComplete'
+        issueTrackerUrl = 'https://github.com/turpid-monkey/UG4LuaAutoComplete/issues'
+        vcsUrl = 'https://github.com/turpid-monkey/UG4LuaAutoComplete.git'
+        licenses = ['BSD 2-clause']
+        labels = ['lua', 'ugshell', 'auto-completion']
+        attributes= ['plat': ['linux', 'osx', 'windows']]
+        publicDownloadNumbers = true
+        version {
+            name = '0.1' //Optional logical version name
+            desc = 'alpha-version'
+            vcsTag = 'master'
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+        }
+    }
 }
 
 repositories {
@@ -46,13 +90,15 @@ buildscript {
         	url  'http://jcenter.bintray.com'
     	}
     }
+    
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+    }
 }        
 
 dependencies {
     compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
     testCompile group: 'junit', name: 'junit', version: '4.10'
-    
-    
 
     compile group: 'edu.gcsc.lua', name: 'luaautocomplete', version: '0.1'
 }
