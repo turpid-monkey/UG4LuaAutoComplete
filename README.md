@@ -1,6 +1,8 @@
 UG4LuaCompletionProvider
 =====================
 
+[![Build Status](https://travis-ci.org/turpid-monkey/UG4LuaAutoComplete.svg?branch=master)](https://travis-ci.org/turpid-monkey/UG4LuaAutoComplete) [![Coverage Status](https://coveralls.io/repos/turpid-monkey/UG4LuaAutoComplete/badge.svg?branch=master)](https://coveralls.io/r/turpid-monkey/UG4LuaAutoComplete?branch=master)
+
 The project source is available under the BSD 2-clause license printed below.
 
 This project is part of an IDE for the UG4 shell created by the Goethe Center of Scientific Computing in Frankfurt.
