@@ -39,10 +39,12 @@ public class RegFunctionDescription implements
 	private String returntype;
 	private String signature;
 	private String html;
+	private int line;
 
 	public static RegFunctionDescription read(BufferedLineReader f)
 			throws IOException {
 		RegFunctionDescription func = new RegFunctionDescription();
+        func.line = f.getLineCounter();
 		func.name = f.readLine();
 		func.returntype = f.readLine();
 		func.signature = f.readLine();
@@ -50,6 +52,10 @@ public class RegFunctionDescription implements
 		return func;
 	}
 
+	public int getLine() {
+		return line;
+	}
+	
 	public String getName() {
 		return name;
 	}

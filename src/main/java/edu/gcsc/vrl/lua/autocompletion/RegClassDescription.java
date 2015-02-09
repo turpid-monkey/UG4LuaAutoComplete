@@ -35,6 +35,7 @@ import edu.gcsc.vrl.BufferedLineReader;
  * @author Martin Rupp
  */
 public class RegClassDescription implements Comparable<RegClassDescription> {
+	int line;
 	private String name;
 	private String html;
 	private String[] classHierachyStr;
@@ -46,7 +47,7 @@ public class RegClassDescription implements Comparable<RegClassDescription> {
 		RegClassDescription descr = new RegClassDescription();
 		descr.memberfunctions = new ArrayList<RegFunctionDescription>();
 		descr.constructors = new ArrayList<RegFunctionDescription>();
-
+        descr.line = f.getLineCounter();
 		descr.name = f.readLine();
 		String line = f.readLine();
 		if (line.trim().length() == 0) {
@@ -87,6 +88,10 @@ public class RegClassDescription implements Comparable<RegClassDescription> {
 		this.html = html;
 	}
 
+	public int getLine() {
+		return line;
+	}
+	
 	public String[] getClassHierachyStr() {
 		return classHierachyStr;
 	}
