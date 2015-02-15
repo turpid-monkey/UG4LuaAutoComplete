@@ -41,21 +41,27 @@ public class RegFunctionDescription implements
 	private String html;
 	private int line;
 
+	private int _paramCount;
+	private String[] _paramNames;
+
 	public static RegFunctionDescription read(BufferedLineReader f)
 			throws IOException {
 		RegFunctionDescription func = new RegFunctionDescription();
-        func.line = f.getLineCounter();
+		func.line = f.getLineCounter();
 		func.name = f.readLine();
 		func.returntype = f.readLine();
 		func.signature = f.readLine();
 		func.html = f.readLine();
+
+		func._paramCount = func.parameterCount();
+		func._paramNames = func.parameterNames();
 		return func;
 	}
 
 	public int getLine() {
 		return line;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -78,6 +84,34 @@ public class RegFunctionDescription implements
 
 	public void setSignature(String signature) {
 		this.signature = signature;
+	}
+
+	private int parameterCount() {
+		if (signature.contains(",")) {
+			return this.signature.split(",").length;
+		}
+		if (signature.contains("()")) {
+			return 0;
+		}
+		return 1;
+	}
+
+	public int getParameterCount() {
+		return _paramCount;
+	}
+
+	public String getParameterName(int param) {
+		return _paramNames[param];
+	}
+
+	private String[] parameterNames() {
+		String[] paramNames = new String[_paramCount];
+		String paramList = signature.substring(signature.indexOf("(") + 1,
+				signature.indexOf(")"));
+		for (int i = 0; i < _paramCount; i++) {
+			paramNames[i] = paramList.split(",")[i].trim();
+		}
+		return paramNames;
 	}
 
 	public String getHtml() {
