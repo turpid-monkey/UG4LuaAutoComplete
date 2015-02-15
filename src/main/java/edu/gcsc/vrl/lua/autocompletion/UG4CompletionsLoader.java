@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import edu.gcsc.vrl.BufferedLineReader;
+
 /**
  * 
  * @author Martin Rupp
@@ -56,7 +57,14 @@ public class UG4CompletionsLoader {
 	}
 
 	public void load(InputStream in) throws IOException {
-		load(new BufferedLineReader(new InputStreamReader(in)));
+		BufferedLineReader reader = new BufferedLineReader(
+				new InputStreamReader(in));
+		try {
+			load(reader);
+		} catch (Exception e) {
+			throw new IOException("Error reading line "
+					+ reader.getLineCounter(), e);
+		}
 	}
 
 	public void load(BufferedLineReader f) throws IOException {
@@ -80,7 +88,8 @@ public class UG4CompletionsLoader {
 				RegClassDescription parent = resolveClass(c
 						.getClassHierachyStr()[i]);
 				if (parent == null) {
-					// friendly failure here, just add a "unresolved" entry to classes
+					// friendly failure here, just add a "unresolved" entry to
+					// classes
 					parent = new RegClassDescription();
 					parent.setName(c.getClassHierachyStr()[i]);
 					parent.setHtml("<b>Unresolved parent class.");

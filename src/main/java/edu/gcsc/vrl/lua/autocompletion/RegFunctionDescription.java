@@ -27,6 +27,7 @@ package edu.gcsc.vrl.lua.autocompletion;
 
 import java.io.IOException;
 
+import edu.gcsc.lua.Logging;
 import edu.gcsc.vrl.BufferedLineReader;
 
 /**
@@ -107,9 +108,16 @@ public class RegFunctionDescription implements
 	private String[] parameterNames() {
 		String[] paramNames = new String[_paramCount];
 		String paramList = signature.substring(signature.indexOf("(") + 1,
-				signature.indexOf(")"));
+				signature.lastIndexOf(")"));
+		String[] paramListArr = paramList.split(",");
 		for (int i = 0; i < _paramCount; i++) {
-			paramNames[i] = paramList.split(",")[i].trim();
+			try {
+				paramNames[i] = paramListArr[i].trim();
+			} catch (ArrayIndexOutOfBoundsException e) {
+				Logging.error("Error parsing signature string '" + signature
+						+ "'");
+				paramNames[i] = "unknown";
+			}
 		}
 		return paramNames;
 	}

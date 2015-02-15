@@ -3,6 +3,7 @@ package edu.gcsc.vrl.lua.autocompletion;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.InputStreamReader;
 import java.io.StringReader;
 
 import org.junit.Test;
@@ -37,18 +38,17 @@ public class UG4CompletionsLoaderTest {
 		assertNotNull(cls);
 	}
 
-	/*
-	@Test
-	public void testSampleFile() throws Exception {
-		UG4CompletionsLoader loader = new UG4CompletionsLoader();
-		loader.load(new BufferedLineReader(
-				new InputStreamReader(
-						UG4CompletionsLoader.class
-								.getClassLoader()
-								.getResourceAsStream(
-										"edu/gcsc/vrl/lua/autocompletion/ugCompletions.txt"))));
-		assertEquals(1150, loader.getClasses().size());
-		assertEquals(313, loader.getFunctions().size());
-
-	}*/
+//	@Test
+//	public void testSampleFile() throws Exception {
+//		UG4CompletionsLoader loader = new UG4CompletionsLoader();
+//		loader.load(new BufferedLineReader(
+//				new InputStreamReader(
+//						UG4CompletionsLoader.class
+//								.getClassLoader()
+//								.getResourceAsStream(
+//										"edu/gcsc/vrl/lua/autocompletion/ugCompletions.txt"))));
+//		assertEquals(1150, loader.getClasses().size());
+//		assertEquals(313, loader.getFunctions().size());
+//
+//	}
 }
